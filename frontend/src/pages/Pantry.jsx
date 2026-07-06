@@ -1,8 +1,9 @@
 import { useEffect, useState, lazy, Suspense } from "react";
 import { getPantryItems, addPantryItem, updatePantryItem, deletePantryItem } from "../api/client";
 import { useAuth } from "../AuthContext";
+import ReceiptScanner from "../components/ReceiptScanner";
 
-// Lazy-load the scanner so html5-qrcode is only downloaded when the user clicks Scan.
+// Lazy-load the barcode scanner so html5-qrcode is only downloaded when needed.
 const BarcodeScanner = lazy(() => import("../components/BarcodeScanner"));
 
 const UNITS = ["pcs", "g", "kg", "ml", "L", "oz", "lb", "cups", "tbsp", "tsp"];
@@ -51,6 +52,7 @@ export default function Pantry() {
   const [addSaving, setAddSaving] = useState(false);
 
   const [showScanner, setShowScanner] = useState(false);
+  const [showReceipt, setShowReceipt] = useState(false);
 
   const [editId, setEditId] = useState(null);
   const [editForm, setEditForm] = useState(EMPTY_FORM);
@@ -136,12 +138,25 @@ export default function Pantry() {
     setItems((prev) => prev.filter((i) => i.id !== id));
   }
 
+  async function handleToggleExclude(item) {
+    const updated = await updatePantryItem(token, item.id, {
+      exclude_from_recipes: !item.exclude_from_recipes,
+    });
+    setItems((prev) => prev.map((i) => (i.id === item.id ? updated : i)));
+  }
+
   function handleScanResult(product) {
     setShowScanner(false);
     // Pre-fill the add form with scanned product data; user still sets quantity.
     setAddForm({ ...EMPTY_FORM, name: product.name, category: product.category });
     setAddError("");
     setShowAdd(true);
+  }
+
+  async function handleReceiptDone(count) {
+    setShowReceipt(false);
+    // Refresh the list so the newly-added items appear.
+    await fetchItems();
   }
 
   const grouped = groupByCategory(items);
@@ -157,9 +172,19 @@ export default function Pantry() {
         </Suspense>
       )}
 
+      {showReceipt && (
+        <ReceiptScanner
+          onDone={handleReceiptDone}
+          onClose={() => setShowReceipt(false)}
+        />
+      )}
+
       <div className="pantry-header">
         <h2>My Pantry</h2>
         <div className="pantry-header-actions">
+          <button className="btn-ghost" onClick={() => setShowReceipt(true)}>
+            📄 Receipt
+          </button>
           <button className="btn-ghost" onClick={() => setShowScanner(true)}>
             📷 Scan
           </button>
@@ -285,15 +310,25 @@ export default function Pantry() {
                   </form>
                 </li>
               ) : (
-                <li key={item.id} className="item-card">
+                <li key={item.id} className={`item-card${item.exclude_from_recipes ? " item-card--excluded" : ""}`}>
                   <div className="item-info">
                     <span className="item-name">{item.name}</span>
                     <span className="item-qty">{item.quantity} {item.unit}</span>
                     {item.expiry_date && (
                       <span className="item-expiry">Expires {item.expiry_date}</span>
                     )}
+                    {item.exclude_from_recipes && (
+                      <span className="item-excluded-tag">not matched to recipes</span>
+                    )}
                   </div>
                   <div className="item-actions">
+                    <button
+                      className="btn-exclude-toggle"
+                      title={item.exclude_from_recipes ? "Include in recipe search" : "Exclude from recipe search"}
+                      onClick={() => handleToggleExclude(item)}
+                    >
+                      {item.exclude_from_recipes ? "🍳" : "🚫"}
+                    </button>
                     <button className="btn-ghost" onClick={() => startEdit(item)}>Edit</button>
                     <button className="btn-danger" onClick={() => handleDelete(item.id)}>Delete</button>
                   </div>

@@ -25,6 +25,11 @@ class PantryItem(db.Model):
     unit = db.Column(db.String(50), nullable=False, default="pcs")
     # Optional — not all items have a known expiry date.
     expiry_date = db.Column(db.Date, nullable=True)
+    category = db.Column(db.String(100), nullable=True)
+    # When True this item is stored in the pantry but excluded from recipe
+    # matching (e.g. plain drinking water — every recipe "uses" it).
+    # Set automatically by normalization; user can flip it via the UI.
+    exclude_from_recipes = db.Column(db.Boolean, nullable=False, default=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(
         db.DateTime,
@@ -39,4 +44,6 @@ class PantryItem(db.Model):
             "quantity": self.quantity,
             "unit": self.unit,
             "expiry_date": self.expiry_date.isoformat() if self.expiry_date else None,
+            "category": self.category,
+            "exclude_from_recipes": self.exclude_from_recipes,
         }

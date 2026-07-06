@@ -5,15 +5,34 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 
 from app import db
 from app.models import PantryItem
+from app.normalization import normalize
 
 pantry_bp = Blueprint("pantry", __name__, url_prefix="/api/pantry")
 
 
 def _parse_expiry(value):
-    """Return a date object or None; raise ValueError on bad format."""
+    """Return a date object or None; accepts YYYY-MM-DD or YYYY/M/D variants."""
     if not value:
         return None
-    return date.fromisoformat(value)  # expects "YYYY-MM-DD"
+    parts = value.replace("/", "-").replace(".", "-").split("-")
+    if len(parts) != 3:
+        raise ValueError(f"Invalid date '{value}'. Use YYYY-MM-DD format.")
+    try:
+        y, m, d = int(parts[0]), int(parts[1]), int(parts[2])
+    except ValueError:
+        raise ValueError(f"Invalid date '{value}'. Use YYYY-MM-DD format.")
+    return date(y, m, d)
+
+
+def _resolve_unit(provided: str, canonical_name: str, suggested: str | None) -> str:
+    """
+    Apply the suggested default unit only when the caller sent "pcs" AND the
+    item has a known non-pcs default — so intentional pcs items (eggs, apples)
+    are never changed, and spices/liquids get a sensible unit automatically.
+    """
+    if suggested and suggested != "pcs" and provided == "pcs":
+        return suggested
+    return provided
 
 
 @pantry_bp.get("")
@@ -30,9 +49,13 @@ def add_item():
     user_id = int(get_jwt_identity())
     data = request.get_json(silent=True) or {}
 
-    name = (data.get("name") or "").strip()
-    if not name:
+    raw_name = (data.get("name") or "").strip()
+    if not raw_name:
         return jsonify(error="name is required"), 400
+
+    canonical, suggested_unit, exclude = normalize(raw_name)
+    provided_unit = (data.get("unit") or "pcs").strip()
+    unit = _resolve_unit(provided_unit, canonical, suggested_unit)
 
     try:
         quantity = float(data.get("quantity", 1))
@@ -40,12 +63,27 @@ def add_item():
     except (ValueError, TypeError) as e:
         return jsonify(error=str(e)), 400
 
+    # Auto-merge: if the user already has this canonical ingredient, add quantity.
+    existing = PantryItem.query.filter_by(
+        user_id=user_id, name=canonical
+    ).first()
+    if existing:
+        existing.quantity += quantity
+        db.session.commit()
+        return jsonify(existing.to_dict()), 200
+
+    # Allow caller to override exclude_from_recipes (e.g. clean-up script).
+    if "exclude_from_recipes" in data:
+        exclude = bool(data["exclude_from_recipes"])
+
     item = PantryItem(
         user_id=user_id,
-        name=name,
+        name=canonical,
         quantity=quantity,
-        unit=(data.get("unit") or "pcs").strip(),
+        unit=unit,
         expiry_date=expiry,
+        category=(data.get("category") or "").strip() or None,
+        exclude_from_recipes=exclude,
     )
     db.session.add(item)
     db.session.commit()
@@ -59,23 +97,53 @@ def update_item(item_id):
     item = PantryItem.query.filter_by(id=item_id, user_id=user_id).first_or_404()
 
     data = request.get_json(silent=True) or {}
+
     if "name" in data:
-        name = (data["name"] or "").strip()
-        if not name:
+        raw_name = (data["name"] or "").strip()
+        if not raw_name:
             return jsonify(error="name cannot be empty"), 400
-        item.name = name
+        canonical, suggested_unit, exclude = normalize(raw_name)
+
+        # If renaming to a name that already exists on another row → merge.
+        duplicate = PantryItem.query.filter(
+            PantryItem.user_id == user_id,
+            PantryItem.name == canonical,
+            PantryItem.id != item_id,
+        ).first()
+        if duplicate:
+            duplicate.quantity += item.quantity
+            db.session.delete(item)
+            db.session.commit()
+            return jsonify(duplicate.to_dict()), 200
+
+        item.name = canonical
+        # Update exclude flag only if it wasn't manually set.
+        item.exclude_from_recipes = exclude
+
+        if "unit" not in data:
+            # Re-derive unit from new name if caller didn't specify.
+            item.unit = _resolve_unit(item.unit, canonical, suggested_unit)
+
     if "quantity" in data:
         try:
             item.quantity = float(data["quantity"])
         except (ValueError, TypeError):
             return jsonify(error="quantity must be a number"), 400
+
     if "unit" in data:
         item.unit = (data["unit"] or "pcs").strip()
+
     if "expiry_date" in data:
         try:
             item.expiry_date = _parse_expiry(data["expiry_date"])
         except ValueError:
             return jsonify(error="expiry_date must be YYYY-MM-DD or null"), 400
+
+    if "category" in data:
+        item.category = (data["category"] or "").strip() or None
+
+    if "exclude_from_recipes" in data:
+        item.exclude_from_recipes = bool(data["exclude_from_recipes"])
 
     db.session.commit()
     return jsonify(item.to_dict())

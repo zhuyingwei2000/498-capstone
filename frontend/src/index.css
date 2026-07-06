@@ -1,3 +1,5 @@
+/* ── Reset & base ────────────────────────────────────────── */
+
 * {
   box-sizing: border-box;
 }
@@ -5,8 +7,31 @@
 body {
   margin: 0;
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-  background: #f4f6f5;
-  color: #1f2b22;
+  background: #f0f4f1;
+  color: #1a2b1c;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Design tokens ───────────────────────────────────────── */
+
+:root {
+  --green:       #2f9e44;
+  --green-dark:  #25793a;
+  --green-light: #ebf7ed;
+  --purple:      #6741d9;
+  --orange:      #e67700;
+  --red:         #c92a2a;
+  --surface:     #ffffff;
+  --border:      #dde8df;
+  --bg:          #f0f4f1;
+  --text:        #1a2b1c;
+  --text-2:      #4a5e4e;
+  --text-3:      #7a9880;
+  --shadow-sm:   0 1px 3px rgba(0,0,0,.06), 0 1px 8px rgba(0,0,0,.04);
+  --shadow-md:   0 2px 8px rgba(0,0,0,.08), 0 4px 20px rgba(0,0,0,.05);
+  --radius:      12px;
+  --radius-sm:   8px;
+  --transition:  0.15s ease;
 }
 
 /* ── Auth pages ─────────────────────────────────────────── */
@@ -17,6 +42,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  background: linear-gradient(160deg, #e8f5e9 0%, #f0f4f1 60%);
 }
 
 .auth-form {
@@ -25,41 +51,78 @@ body {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  background: #fff;
-  padding: 28px 24px;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  background: var(--surface);
+  padding: 32px 28px;
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+}
+
+.auth-logo {
+  text-align: center;
+  font-size: 2.8rem;
+  margin-bottom: 2px;
+  line-height: 1;
 }
 
 .auth-form h1 {
-  font-size: 1.4rem;
-  margin: 0 0 8px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 4px;
   text-align: center;
+  color: var(--green);
+}
+
+.auth-subtitle {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-3);
+  margin: 0 0 6px;
 }
 
 .auth-form label {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-2);
 }
 
 .auth-form input {
-  padding: 10px 12px;
-  border: 1px solid #ccd6cf;
-  border-radius: 8px;
+  padding: 11px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
   font-size: 1rem;
+  color: var(--text);
+  background: var(--surface);
+  transition: border-color var(--transition), box-shadow var(--transition);
+  outline: none;
+}
+
+.auth-form input:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(47,158,68,.12);
 }
 
 .auth-form button {
-  margin-top: 6px;
-  padding: 12px;
+  margin-top: 4px;
+  padding: 13px;
   border: none;
-  border-radius: 8px;
-  background: #2f9e44;
+  border-radius: var(--radius-sm);
+  background: var(--green);
   color: #fff;
   font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
+  transition: background var(--transition), transform var(--transition);
+}
+
+.auth-form button:hover:not(:disabled) {
+  background: var(--green-dark);
+}
+
+.auth-form button:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .auth-form button:disabled {
@@ -70,10 +133,17 @@ body {
 .auth-switch {
   text-align: center;
   font-size: 0.85rem;
+  color: var(--text-3);
   margin: 0;
 }
 
-/* ── App shell (post-login layout) ──────────────────────── */
+.auth-switch a {
+  color: var(--green);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* ── App shell ───────────────────────────────────────────── */
 
 .app-shell {
   display: flex;
@@ -85,24 +155,26 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
-  background: #fff;
-  border-bottom: 1px solid #e0e8e2;
+  padding: 13px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
   position: sticky;
   top: 0;
   z-index: 10;
 }
 
 .app-title {
-  font-size: 1.2rem;
-  font-weight: 700;
+  font-size: 1.25rem;
+  font-weight: 800;
   margin: 0;
-  color: #2f9e44;
+  color: var(--green);
+  letter-spacing: -0.01em;
 }
 
 .app-content {
   flex: 1;
-  padding: 16px 16px 80px; /* bottom padding clears the nav bar */
+  padding: 16px 16px 88px;
   max-width: 640px;
   width: 100%;
   margin: 0 auto;
@@ -116,81 +188,184 @@ body {
   left: 0;
   right: 0;
   display: flex;
-  background: #fff;
-  border-top: 1px solid #e0e8e2;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -2px 12px rgba(0,0,0,.06);
   z-index: 10;
+  padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
 .nav-tab {
   flex: 1;
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  padding: 10px 0;
+  padding: 10px 0 8px;
   border: none;
   background: none;
   font-size: 0.72rem;
-  color: #8a9e8f;
+  color: var(--text-3);
   cursor: pointer;
+  transition: color var(--transition);
 }
 
 .nav-tab--active {
-  color: #2f9e44;
+  color: var(--green);
   font-weight: 600;
 }
 
+.nav-tab--active::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 20%;
+  right: 20%;
+  height: 2.5px;
+  background: var(--green);
+  border-radius: 0 0 3px 3px;
+}
+
 .nav-tab--disabled {
-  opacity: 0.4;
+  opacity: 0.35;
   cursor: default;
 }
 
 .nav-icon {
-  font-size: 1.3rem;
+  font-size: 1.35rem;
 }
 
-/* ── Pantry page ─────────────────────────────────────────── */
+/* ── Nav badge ───────────────────────────────────────────── */
 
-.pantry-page {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.pantry-header {
+.nav-badge {
+  position: absolute;
+  top: 5px;
+  right: calc(50% - 20px);
+  background: #e03131;
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  padding: 0 4px;
+  border: 2px solid var(--surface);
 }
 
-.pantry-header h2 {
-  margin: 0;
-  font-size: 1.2rem;
+/* ── Shared button utilities ─────────────────────────────── */
+
+.btn-primary {
+  padding: 10px 16px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--green);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
 }
 
-/* ── Shared form styles (add / edit forms) ───────────────── */
+.btn-primary:hover:not(:disabled) {
+  background: var(--green-dark);
+  box-shadow: 0 2px 8px rgba(47,158,68,.3);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.btn-primary:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.btn-ghost {
+  padding: 10px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color var(--transition), background var(--transition);
+}
+
+.btn-ghost:hover {
+  border-color: #aabcad;
+  background: #f8fbf8;
+}
+
+.btn-danger {
+  padding: 10px 16px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: #fff0f0;
+  color: var(--red);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--transition);
+}
+
+.btn-danger:hover {
+  background: #ffe0e0;
+}
+
+/* ── Shared form styles ──────────────────────────────────── */
 
 .item-form {
-  background: #fff;
-  border: 1px solid #e0e8e2;
-  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  box-shadow: var(--shadow-sm);
 }
 
 .item-form h3 {
   margin: 0;
   font-size: 1rem;
+  font-weight: 700;
 }
 
 .item-form input,
-.item-form select {
-  padding: 9px 12px;
-  border: 1px solid #ccd6cf;
-  border-radius: 8px;
+.item-form select,
+.item-card--editing input,
+.item-card--editing select {
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
   font-size: 0.95rem;
+  width: 100%;
+  color: var(--text);
+  background: var(--surface);
+  transition: border-color var(--transition), box-shadow var(--transition);
+  outline: none;
+}
+
+.item-form input:focus,
+.item-form select:focus,
+.item-card--editing input:focus,
+.item-card--editing select:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(47,158,68,.1);
+}
+
+.item-card--editing form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   width: 100%;
 }
 
@@ -199,9 +374,7 @@ body {
   gap: 8px;
 }
 
-.qty-row input {
-  flex: 1;
-}
+.qty-row input { flex: 1; }
 
 .qty-row select {
   width: 90px;
@@ -212,11 +385,37 @@ body {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  font-size: 0.85rem;
-  color: #4a5e4e;
+  font-size: 0.84rem;
+  color: var(--text-2);
+  font-weight: 500;
 }
 
 .form-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* ── Pantry page ─────────────────────────────────────────── */
+
+.pantry-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pantry-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pantry-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.pantry-header-actions {
   display: flex;
   gap: 8px;
 }
@@ -230,17 +429,17 @@ body {
 }
 
 .category-title {
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #6b8f72;
+  letter-spacing: 0.07em;
+  color: var(--text-3);
   margin: 0;
   padding: 4px 0;
-  border-bottom: 1px solid #e0e8e2;
+  border-bottom: 1px solid var(--border);
 }
 
-/* ── Pantry item list ────────────────────────────────────── */
+/* ── Pantry item cards ───────────────────────────────────── */
 
 .item-list {
   list-style: none;
@@ -248,18 +447,24 @@ body {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .item-card {
-  background: #fff;
-  border: 1px solid #e0e8e2;
-  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition);
+}
+
+.item-card:hover {
+  box-shadow: var(--shadow-md);
 }
 
 .item-card--editing {
@@ -267,26 +472,61 @@ body {
   align-items: stretch;
 }
 
+.item-card--excluded {
+  opacity: 0.7;
+}
+
+.item-excluded-tag {
+  display: inline-block;
+  margin-top: 2px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-3);
+  background: #f0f4f1;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  letter-spacing: 0.02em;
+}
+
+.btn-exclude-toggle {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: background var(--transition), border-color var(--transition);
+  flex-shrink: 0;
+}
+
+.btn-exclude-toggle:hover {
+  background: var(--bg);
+  border-color: #aabcad;
+}
+
 .item-info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
   min-width: 0;
 }
 
 .item-name {
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.98rem;
 }
 
 .item-qty {
-  font-size: 0.85rem;
-  color: #4a5e4e;
+  font-size: 0.82rem;
+  color: var(--text-2);
 }
 
 .item-expiry {
-  font-size: 0.8rem;
-  color: #e67700;
+  font-size: 0.78rem;
+  color: var(--orange);
+  font-weight: 500;
 }
 
 .item-actions {
@@ -295,119 +535,743 @@ body {
   flex-shrink: 0;
 }
 
-/* ── Shared button utilities ─────────────────────────────── */
-
-.btn-primary {
-  padding: 9px 16px;
-  border: none;
-  border-radius: 8px;
-  background: #2f9e44;
-  color: #fff;
-  font-size: 0.9rem;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.btn-primary:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
-
-.btn-ghost {
-  padding: 9px 16px;
-  border: 1px solid #ccd6cf;
-  border-radius: 8px;
-  background: #fff;
-  font-size: 0.9rem;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.btn-danger {
-  padding: 9px 16px;
-  border: none;
-  border-radius: 8px;
-  background: #fff0f0;
-  color: #c92a2a;
-  font-size: 0.9rem;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
 /* ── Barcode scanner overlay ─────────────────────────────── */
 
 .scanner-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(0, 0, 0, 0.88);
   z-index: 100;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 16px;
+  backdrop-filter: blur(2px);
 }
 
 .scanner-modal {
-  background: #fff;
-  border-radius: 16px;
-  overflow: hidden;
-  width: min(420px, 95vw);
+  background: var(--surface);
+  border-radius: 20px;
+  width: min(420px, 100%);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0,0,0,.25);
 }
 
 .scanner-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 16px;
-  font-weight: 600;
-  border-bottom: 1px solid #e0e8e2;
+  padding: 16px 18px;
+  font-weight: 700;
+  font-size: 1rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
 }
 
-.scanner-close {
+.scanner-close-btn {
+  background: #f0f4f1;
   border: none;
-  padding: 4px 8px;
   font-size: 1rem;
+  cursor: pointer;
+  padding: 6px 10px;
+  color: var(--text-2);
+  border-radius: 6px;
+  line-height: 1;
+  transition: background var(--transition);
+}
+
+.scanner-close-btn:hover {
+  background: #dde8df;
 }
 
 .scanner-viewport {
   width: 100%;
-  /* html5-qrcode sets its own height via the video element */
+  height: 300px;
+  background: #000;
+  position: relative;
 }
 
-/* Strip the default html5-qrcode UI chrome we don't need */
-#barcode-reader-viewport > img,
-#barcode-reader-viewport button {
-  display: none !important;
+#barcode-reader-viewport video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+
+#barcode-reader-viewport canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .scanner-footer {
-  padding: 12px 16px;
+  padding: 16px 18px;
   text-align: center;
-  min-height: 56px;
+  min-height: 58px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  flex-shrink: 0;
 }
 
-.pantry-header-actions {
+.scanner-status {
+  font-size: 0.88rem;
+  color: var(--text-2);
+  margin: 0;
+}
+
+/* ── Receipt scanner modal ───────────────────────────────── */
+
+.receipt-modal {
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.receipt-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.receipt-camera-viewport {
+  width: 100%;
+  height: 280px;
+  background: #111;
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.receipt-camera-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.receipt-camera-error {
+  color: var(--orange);
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 16px;
+  margin: 0;
+}
+
+.receipt-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  padding: 36px 16px;
+  background: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+  color: var(--text-2);
+  transition: border-color var(--transition), background var(--transition);
+}
+
+.receipt-placeholder:hover {
+  border-color: var(--green);
+  background: var(--green-light);
+}
+
+.receipt-icon { font-size: 2.6rem; }
+
+.receipt-placeholder p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.receipt-preview {
+  width: 100%;
+  max-height: 260px;
+  object-fit: contain;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.receipt-hint {
+  font-size: 0.84rem;
+  color: var(--text-2);
+  margin: 0;
+}
+
+.receipt-item-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.receipt-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  transition: opacity var(--transition);
+}
+
+.receipt-item--unchecked { opacity: 0.4; }
+
+.receipt-checkbox {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  accent-color: var(--green);
+  cursor: pointer;
+}
+
+.receipt-item-fields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.receipt-item-name {
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 0.9rem;
+  width: 100%;
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.receipt-item-name:focus { border-color: var(--green); }
+
+.receipt-qty-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.receipt-qty-input {
+  width: 60px;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 6px;
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.receipt-cat-tag {
+  margin-left: auto;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--text-3);
+  border-radius: 4px;
+  padding: 2px 7px;
+  white-space: nowrap;
+}
+
+/* ── Recipes page ────────────────────────────────────────── */
+
+.recipes-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.section-heading {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.ingredient-picker {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+.picker-hint {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--text-2);
+  font-weight: 500;
+}
+
+.ingredient-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ingredient-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.ingredient-group-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-3);
+}
+
+.ingredient-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.ingredient-chip {
+  padding: 6px 13px;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  background: var(--surface);
+  font-size: 0.84rem;
+  cursor: pointer;
+  color: var(--text);
+  transition: background var(--transition), border-color var(--transition),
+              color var(--transition), box-shadow var(--transition);
+}
+
+.ingredient-chip:hover {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.ingredient-chip--active {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(47,158,68,.25);
+}
+
+.recipe-action-row {
+  display: flex;
+  gap: 10px;
+}
+
+.find-recipes-btn {
+  flex: 1;
+  padding: 13px;
+  font-size: 1rem;
+}
+
+.btn-ai-ideas {
+  padding: 13px 18px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--purple);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background var(--transition), box-shadow var(--transition);
+}
+
+.btn-ai-ideas:hover:not(:disabled) {
+  background: #5535b8;
+  box-shadow: 0 2px 8px rgba(103,65,217,.3);
+}
+
+.btn-ai-ideas:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+/* ── Recipe cards ────────────────────────────────────────── */
+
+.recipe-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.recipe-section-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.recipe-count {
+  background: var(--green);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.recipe-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition);
+}
+
+.recipe-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.recipe-card--suggestion {
+  border-color: #ffc078;
+}
+
+.recipe-card--ai {
+  border-color: #b197fc;
+}
+
+.recipe-card-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--transition);
+}
+
+.recipe-card-header:hover {
+  background: #f8fbf8;
+}
+
+.recipe-thumb {
+  width: 68px;
+  height: 68px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--bg);
+}
+
+.recipe-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.recipe-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1.3;
+}
+
+.recipe-meta {
+  font-size: 0.78rem;
+  color: var(--text-3);
+}
+
+.recipe-add-hint {
+  font-size: 0.82rem;
+  color: var(--orange);
+  font-weight: 600;
+}
+
+.recipe-chevron {
+  font-size: 0.7rem;
+  color: var(--text-3);
+  flex-shrink: 0;
+}
+
+.recipe-details {
+  padding: 0 14px 16px;
+  border-top: 1px solid var(--border);
+}
+
+.recipe-detail-heading {
+  font-size: 0.72rem;
+  font-weight: 700;
+  margin: 14px 0 6px;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.recipe-ingredients {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.recipe-ingredient {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 0.87rem;
+  color: var(--text-2);
+}
+
+.recipe-ingredient--owned {
+  color: var(--green);
+  font-weight: 600;
+}
+
+.recipe-ingredient--missing {
+  color: var(--orange);
+  font-weight: 600;
+}
+
+.recipe-ing-marker {
+  width: 14px;
+  flex-shrink: 0;
+  font-size: 0.8rem;
+}
+
+.recipe-measure { color: var(--text-3); }
+
+.recipe-instructions {
+  font-size: 0.85rem;
+  line-height: 1.65;
+  color: var(--text);
+  white-space: pre-wrap;
+  margin: 0;
+}
+
+.recipe-card-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.ai-recipe-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  background: #f3f0ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.ai-recipe-steps {
+  padding-left: 18px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ai-recipe-steps li {
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+/* ── Action buttons inside recipe cards ──────────────────── */
+
+.btn-add-to-list {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 15px;
+  background: var(--green-light);
+  color: var(--green);
+  border: 1.5px solid var(--green);
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+
+.btn-add-to-list:hover {
+  background: var(--green);
+  color: #fff;
+}
+
+.btn-add-to-list--done {
+  background: var(--green);
+  color: #fff;
+}
+
+.btn-youtube {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 15px;
+  background: #ff0000;
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: background var(--transition);
+}
+
+.btn-youtube:hover { background: #cc0000; }
+
+/* ── Shopping list page ──────────────────────────────────── */
+
+.shopping-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.shopping-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.shopping-header-actions {
   display: flex;
   gap: 8px;
+}
+
+.shopping-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.shopping-recipe-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-3);
+  margin: 0;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.shopping-item-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.shopping-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 13px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: var(--shadow-sm);
+  transition: opacity var(--transition), box-shadow var(--transition);
+}
+
+.shopping-item:hover { box-shadow: var(--shadow-md); }
+
+.shopping-item--checked { opacity: 0.4; }
+
+.shopping-checkbox {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  accent-color: var(--green);
+  cursor: pointer;
+}
+
+.shopping-item-name {
+  flex: 1;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.shopping-item--checked .shopping-item-name {
+  text-decoration: line-through;
+  color: var(--text-3);
+}
+
+.shopping-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.btn-instacart {
+  font-size: 1.15rem;
+  text-decoration: none;
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: var(--green-light);
+  border: 1px solid var(--border);
+  line-height: 1;
+  transition: background var(--transition);
+}
+
+.btn-instacart:hover { background: #d4edda; }
+
+.shopping-remove-btn {
+  background: none;
+  border: none;
+  color: #bbb;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 5px 7px;
+  border-radius: 4px;
+  line-height: 1;
+  transition: color var(--transition), background var(--transition);
+}
+
+.shopping-remove-btn:hover {
+  color: var(--red);
+  background: #fff0f0;
 }
 
 /* ── Misc ────────────────────────────────────────────────── */
 
 .form-error {
-  color: #c92a2a;
-  font-size: 0.85rem;
+  color: var(--red);
+  font-size: 0.84rem;
   margin: 0;
+  font-weight: 500;
 }
 
 .status-msg {
-  color: #6b7f6e;
+  color: var(--text-3);
   font-size: 0.9rem;
   text-align: center;
-  padding: 24px 0;
+  padding: 32px 0;
+  line-height: 1.6;
 }
