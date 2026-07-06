@@ -221,6 +221,25 @@ body {
   gap: 8px;
 }
 
+/* ── Category sections ───────────────────────────────────── */
+
+.category-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.category-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6b8f72;
+  margin: 0;
+  padding: 4px 0;
+  border-bottom: 1px solid #e0e8e2;
+}
+
 /* ── Pantry item list ────────────────────────────────────── */
 
 .item-list {
@@ -313,6 +332,69 @@ body {
   font-size: 0.9rem;
   cursor: pointer;
   white-space: nowrap;
+}
+
+/* ── Barcode scanner overlay ─────────────────────────────── */
+
+.scanner-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scanner-modal {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  width: min(420px, 95vw);
+  display: flex;
+  flex-direction: column;
+}
+
+.scanner-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  font-weight: 600;
+  border-bottom: 1px solid #e0e8e2;
+}
+
+.scanner-close {
+  border: none;
+  padding: 4px 8px;
+  font-size: 1rem;
+}
+
+.scanner-viewport {
+  width: 100%;
+  /* html5-qrcode sets its own height via the video element */
+}
+
+/* Strip the default html5-qrcode UI chrome we don't need */
+#barcode-reader-viewport > img,
+#barcode-reader-viewport button {
+  display: none !important;
+}
+
+.scanner-footer {
+  padding: 12px 16px;
+  text-align: center;
+  min-height: 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.pantry-header-actions {
+  display: flex;
+  gap: 8px;
 }
 
 /* ── Misc ────────────────────────────────────────────────── */
