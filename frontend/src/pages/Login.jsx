@@ -29,10 +29,10 @@ export default function Login() {
   return (
     <div className="auth-page">
       <form className="auth-form" onSubmit={handleSubmit}>
-        <h1>登录 PantryPilot</h1>
+        <h1>Log in to PantryPilot</h1>
         {error && <p className="form-error">{error}</p>}
         <label>
-          邮箱
+          Email
           <input
             type="email"
             value={email}
@@ -41,7 +41,7 @@ export default function Login() {
           />
         </label>
         <label>
-          密码
+          Password
           <input
             type="password"
             value={password}
@@ -50,10 +50,10 @@ export default function Login() {
           />
         </label>
         <button type="submit" disabled={loading}>
-          {loading ? "登录中..." : "登录"}
+          {loading ? "Logging in..." : "Log in"}
         </button>
         <p className="auth-switch">
-          还没有账号？<Link to="/register">注册</Link>
+          Don't have an account? <Link to="/register">Sign up</Link>
         </p>
       </form>
     </div>

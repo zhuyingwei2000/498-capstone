@@ -9,15 +9,11 @@ body {
   color: #1f2b22;
 }
 
-/* Mobile-first: forms and pages fill the viewport width, content
-   only gets capped to a comfortable column once the screen is wide. */
-.auth-page,
-.home-page {
-  min-height: 100vh;
-  padding: 24px 16px;
-}
+/* ── Auth pages ─────────────────────────────────────────── */
 
 .auth-page {
+  min-height: 100vh;
+  padding: 24px 16px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -77,22 +73,259 @@ body {
   margin: 0;
 }
 
+/* ── App shell (post-login layout) ──────────────────────── */
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #fff;
+  border-bottom: 1px solid #e0e8e2;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.app-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0;
+  color: #2f9e44;
+}
+
+.app-content {
+  flex: 1;
+  padding: 16px 16px 80px; /* bottom padding clears the nav bar */
+  max-width: 640px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ── Bottom navigation ───────────────────────────────────── */
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  background: #fff;
+  border-top: 1px solid #e0e8e2;
+  z-index: 10;
+}
+
+.nav-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 0;
+  border: none;
+  background: none;
+  font-size: 0.72rem;
+  color: #8a9e8f;
+  cursor: pointer;
+}
+
+.nav-tab--active {
+  color: #2f9e44;
+  font-weight: 600;
+}
+
+.nav-tab--disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.nav-icon {
+  font-size: 1.3rem;
+}
+
+/* ── Pantry page ─────────────────────────────────────────── */
+
+.pantry-page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pantry-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pantry-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+/* ── Shared form styles (add / edit forms) ───────────────── */
+
+.item-form {
+  background: #fff;
+  border: 1px solid #e0e8e2;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.item-form h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.item-form input,
+.item-form select {
+  padding: 9px 12px;
+  border: 1px solid #ccd6cf;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  width: 100%;
+}
+
+.qty-row {
+  display: flex;
+  gap: 8px;
+}
+
+.qty-row input {
+  flex: 1;
+}
+
+.qty-row select {
+  width: 90px;
+  flex-shrink: 0;
+}
+
+.expiry-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.85rem;
+  color: #4a5e4e;
+}
+
+.form-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* ── Pantry item list ────────────────────────────────────── */
+
+.item-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.item-card {
+  background: #fff;
+  border: 1px solid #e0e8e2;
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.item-card--editing {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.item-name {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.item-qty {
+  font-size: 0.85rem;
+  color: #4a5e4e;
+}
+
+.item-expiry {
+  font-size: 0.8rem;
+  color: #e67700;
+}
+
+.item-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* ── Shared button utilities ─────────────────────────────── */
+
+.btn-primary {
+  padding: 9px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #2f9e44;
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.btn-ghost {
+  padding: 9px 16px;
+  border: 1px solid #ccd6cf;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-danger {
+  padding: 9px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #fff0f0;
+  color: #c92a2a;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* ── Misc ────────────────────────────────────────────────── */
+
 .form-error {
   color: #c92a2a;
   font-size: 0.85rem;
   margin: 0;
 }
 
-.home-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.home-header button {
-  padding: 8px 14px;
-  border: 1px solid #ccd6cf;
-  border-radius: 8px;
-  background: #fff;
-  cursor: pointer;
+.status-msg {
+  color: #6b7f6e;
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 24px 0;
 }

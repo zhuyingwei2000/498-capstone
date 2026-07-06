@@ -29,10 +29,10 @@ export default function Register() {
   return (
     <div className="auth-page">
       <form className="auth-form" onSubmit={handleSubmit}>
-        <h1>注册 PantryPilot</h1>
+        <h1>Sign up for PantryPilot</h1>
         {error && <p className="form-error">{error}</p>}
         <label>
-          邮箱
+          Email
           <input
             type="email"
             value={email}
@@ -41,7 +41,7 @@ export default function Register() {
           />
         </label>
         <label>
-          密码（至少 8 位）
+          Password (at least 8 characters)
           <input
             type="password"
             value={password}
@@ -51,10 +51,10 @@ export default function Register() {
           />
         </label>
         <button type="submit" disabled={loading}>
-          {loading ? "注册中..." : "注册"}
+          {loading ? "Signing up..." : "Sign up"}
         </button>
         <p className="auth-switch">
-          已有账号？<Link to="/login">登录</Link>
+          Already have an account? <Link to="/login">Log in</Link>
         </p>
       </form>
     </div>
