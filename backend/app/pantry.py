@@ -9,6 +9,8 @@ from app.normalization import normalize
 
 pantry_bp = Blueprint("pantry", __name__, url_prefix="/api/pantry")
 
+UNIT = "pcs"  # single unit for everything — simplicity over precision
+
 
 def _parse_expiry(value):
     """Return a date object or None; accepts YYYY-MM-DD or YYYY/M/D variants."""
@@ -22,17 +24,6 @@ def _parse_expiry(value):
     except ValueError:
         raise ValueError(f"Invalid date '{value}'. Use YYYY-MM-DD format.")
     return date(y, m, d)
-
-
-def _resolve_unit(provided: str, canonical_name: str, suggested: str | None) -> str:
-    """
-    Apply the suggested default unit only when the caller sent "pcs" AND the
-    item has a known non-pcs default — so intentional pcs items (eggs, apples)
-    are never changed, and spices/liquids get a sensible unit automatically.
-    """
-    if suggested and suggested != "pcs" and provided == "pcs":
-        return suggested
-    return provided
 
 
 @pantry_bp.get("")
@@ -53,9 +44,7 @@ def add_item():
     if not raw_name:
         return jsonify(error="name is required"), 400
 
-    canonical, suggested_unit, exclude = normalize(raw_name)
-    provided_unit = (data.get("unit") or "pcs").strip()
-    unit = _resolve_unit(provided_unit, canonical, suggested_unit)
+    canonical, exclude = normalize(raw_name)
 
     try:
         quantity = float(data.get("quantity", 1))
@@ -63,16 +52,14 @@ def add_item():
     except (ValueError, TypeError) as e:
         return jsonify(error=str(e)), 400
 
-    # Auto-merge: if the user already has this canonical ingredient, add quantity.
-    existing = PantryItem.query.filter_by(
-        user_id=user_id, name=canonical
-    ).first()
+    # Auto-merge: same canonical name for this user → add quantity to existing row.
+    existing = PantryItem.query.filter_by(user_id=user_id, name=canonical).first()
     if existing:
         existing.quantity += quantity
         db.session.commit()
         return jsonify(existing.to_dict()), 200
 
-    # Allow caller to override exclude_from_recipes (e.g. clean-up script).
+    # Allow caller to override exclude_from_recipes (used by the cleanup script).
     if "exclude_from_recipes" in data:
         exclude = bool(data["exclude_from_recipes"])
 
@@ -80,7 +67,7 @@ def add_item():
         user_id=user_id,
         name=canonical,
         quantity=quantity,
-        unit=unit,
+        unit=UNIT,
         expiry_date=expiry,
         category=(data.get("category") or "").strip() or None,
         exclude_from_recipes=exclude,
@@ -102,9 +89,10 @@ def update_item(item_id):
         raw_name = (data["name"] or "").strip()
         if not raw_name:
             return jsonify(error="name cannot be empty"), 400
-        canonical, suggested_unit, exclude = normalize(raw_name)
 
-        # If renaming to a name that already exists on another row → merge.
+        canonical, exclude = normalize(raw_name)
+
+        # If renaming collides with another existing row → merge into it.
         duplicate = PantryItem.query.filter(
             PantryItem.user_id == user_id,
             PantryItem.name == canonical,
@@ -117,21 +105,13 @@ def update_item(item_id):
             return jsonify(duplicate.to_dict()), 200
 
         item.name = canonical
-        # Update exclude flag only if it wasn't manually set.
         item.exclude_from_recipes = exclude
-
-        if "unit" not in data:
-            # Re-derive unit from new name if caller didn't specify.
-            item.unit = _resolve_unit(item.unit, canonical, suggested_unit)
 
     if "quantity" in data:
         try:
             item.quantity = float(data["quantity"])
         except (ValueError, TypeError):
             return jsonify(error="quantity must be a number"), 400
-
-    if "unit" in data:
-        item.unit = (data["unit"] or "pcs").strip()
 
     if "expiry_date" in data:
         try:

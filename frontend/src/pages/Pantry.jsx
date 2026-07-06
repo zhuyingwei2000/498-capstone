@@ -3,29 +3,17 @@ import { getPantryItems, addPantryItem, updatePantryItem, deletePantryItem } fro
 import { useAuth } from "../AuthContext";
 import ReceiptScanner from "../components/ReceiptScanner";
 
-// Lazy-load the barcode scanner so html5-qrcode is only downloaded when needed.
 const BarcodeScanner = lazy(() => import("../components/BarcodeScanner"));
 
-const UNITS = ["pcs", "g", "kg", "ml", "L", "oz", "lb", "cups", "tbsp", "tsp"];
-
 const CATEGORIES = [
-  "Vegetables",
-  "Fruits",
-  "Meat & Seafood",
-  "Dairy & Eggs",
-  "Grains & Bread",
-  "Condiments & Spices",
-  "Beverages",
-  "Snacks",
-  "Other",
+  "Vegetables", "Fruits", "Meat & Seafood", "Dairy & Eggs",
+  "Grains & Bread", "Condiments & Spices", "Beverages", "Snacks", "Other",
 ];
 
-// Items with no category fall into this bucket for display purposes.
 const UNCATEGORIZED = "Uncategorized";
 
-const EMPTY_FORM = { name: "", quantity: "1", unit: "pcs", expiry_date: "", category: "" };
+const EMPTY_FORM = { name: "", quantity: "1", expiry_date: "", category: "" };
 
-// Group a flat array of items into { category: [items] }, preserving CATEGORIES order.
 function groupByCategory(items) {
   const groups = {};
   for (const item of items) {
@@ -33,7 +21,6 @@ function groupByCategory(items) {
     if (!groups[key]) groups[key] = [];
     groups[key].push(item);
   }
-  // Sort groups: known categories first (in defined order), then Uncategorized last.
   const order = [...CATEGORIES, UNCATEGORIZED];
   return Object.entries(groups).sort(
     ([a], [b]) => order.indexOf(a) - order.indexOf(b)
@@ -59,16 +46,13 @@ export default function Pantry() {
   const [editError, setEditError] = useState("");
   const [editSaving, setEditSaving] = useState(false);
 
-  useEffect(() => {
-    fetchItems();
-  }, []);
+  useEffect(() => { fetchItems(); }, []);
 
   async function fetchItems() {
     setLoading(true);
     setError("");
     try {
-      const data = await getPantryItems(token);
-      setItems(data);
+      setItems(await getPantryItems(token));
     } catch (err) {
       setError(err.message);
     } finally {
@@ -81,16 +65,15 @@ export default function Pantry() {
     setAddError("");
     setAddSaving(true);
     try {
-      const newItem = await addPantryItem(token, {
+      await addPantryItem(token, {
         name: addForm.name.trim(),
         quantity: parseFloat(addForm.quantity) || 1,
-        unit: addForm.unit,
         expiry_date: addForm.expiry_date || null,
         category: addForm.category || null,
       });
-      setItems((prev) => [...prev, newItem].sort((a, b) => a.name.localeCompare(b.name)));
       setAddForm(EMPTY_FORM);
       setShowAdd(false);
+      await fetchItems();
     } catch (err) {
       setAddError(err.message);
     } finally {
@@ -103,7 +86,6 @@ export default function Pantry() {
     setEditForm({
       name: item.name,
       quantity: String(item.quantity),
-      unit: item.unit,
       expiry_date: item.expiry_date || "",
       category: item.category || "",
     });
@@ -115,17 +97,14 @@ export default function Pantry() {
     setEditError("");
     setEditSaving(true);
     try {
-      const updated = await updatePantryItem(token, editId, {
+      await updatePantryItem(token, editId, {
         name: editForm.name.trim(),
         quantity: parseFloat(editForm.quantity) || 1,
-        unit: editForm.unit,
         expiry_date: editForm.expiry_date || null,
         category: editForm.category || null,
       });
-      setItems((prev) =>
-        prev.map((i) => (i.id === editId ? updated : i)).sort((a, b) => a.name.localeCompare(b.name))
-      );
       setEditId(null);
+      await fetchItems();
     } catch (err) {
       setEditError(err.message);
     } finally {
@@ -135,27 +114,25 @@ export default function Pantry() {
 
   async function handleDelete(id) {
     await deletePantryItem(token, id);
-    setItems((prev) => prev.filter((i) => i.id !== id));
+    await fetchItems();
   }
 
   async function handleToggleExclude(item) {
-    const updated = await updatePantryItem(token, item.id, {
+    await updatePantryItem(token, item.id, {
       exclude_from_recipes: !item.exclude_from_recipes,
     });
-    setItems((prev) => prev.map((i) => (i.id === item.id ? updated : i)));
+    await fetchItems();
   }
 
   function handleScanResult(product) {
     setShowScanner(false);
-    // Pre-fill the add form with scanned product data; user still sets quantity.
     setAddForm({ ...EMPTY_FORM, name: product.name, category: product.category });
     setAddError("");
     setShowAdd(true);
   }
 
-  async function handleReceiptDone(count) {
+  async function handleReceiptDone() {
     setShowReceipt(false);
-    // Refresh the list so the newly-added items appear.
     await fetchItems();
   }
 
@@ -165,29 +142,19 @@ export default function Pantry() {
     <div className="pantry-page">
       {showScanner && (
         <Suspense fallback={null}>
-          <BarcodeScanner
-            onResult={handleScanResult}
-            onClose={() => setShowScanner(false)}
-          />
+          <BarcodeScanner onResult={handleScanResult} onClose={() => setShowScanner(false)} />
         </Suspense>
       )}
 
       {showReceipt && (
-        <ReceiptScanner
-          onDone={handleReceiptDone}
-          onClose={() => setShowReceipt(false)}
-        />
+        <ReceiptScanner onDone={handleReceiptDone} onClose={() => setShowReceipt(false)} />
       )}
 
       <div className="pantry-header">
         <h2>My Pantry</h2>
         <div className="pantry-header-actions">
-          <button className="btn-ghost" onClick={() => setShowReceipt(true)}>
-            📄 Receipt
-          </button>
-          <button className="btn-ghost" onClick={() => setShowScanner(true)}>
-            📷 Scan
-          </button>
+          <button className="btn-ghost" onClick={() => setShowReceipt(true)}>📄 Receipt</button>
+          <button className="btn-ghost" onClick={() => setShowScanner(true)}>📷 Scan</button>
           <button className="btn-primary" onClick={() => { setShowAdd(true); setAddError(""); }}>
             + Add Item
           </button>
@@ -204,22 +171,14 @@ export default function Pantry() {
             onChange={(e) => setAddForm({ ...addForm, name: e.target.value })}
             required
           />
-          <div className="qty-row">
-            <input
-              type="number"
-              min="0"
-              step="any"
-              placeholder="Qty"
-              value={addForm.quantity}
-              onChange={(e) => setAddForm({ ...addForm, quantity: e.target.value })}
-            />
-            <select
-              value={addForm.unit}
-              onChange={(e) => setAddForm({ ...addForm, unit: e.target.value })}
-            >
-              {UNITS.map((u) => <option key={u}>{u}</option>)}
-            </select>
-          </div>
+          <input
+            type="number"
+            min="0"
+            step="any"
+            placeholder="Quantity"
+            value={addForm.quantity}
+            onChange={(e) => setAddForm({ ...addForm, quantity: e.target.value })}
+          />
           <select
             value={addForm.category}
             onChange={(e) => setAddForm({ ...addForm, category: e.target.value })}
@@ -268,21 +227,14 @@ export default function Pantry() {
                       onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
                       required
                     />
-                    <div className="qty-row">
-                      <input
-                        type="number"
-                        min="0"
-                        step="any"
-                        value={editForm.quantity}
-                        onChange={(e) => setEditForm({ ...editForm, quantity: e.target.value })}
-                      />
-                      <select
-                        value={editForm.unit}
-                        onChange={(e) => setEditForm({ ...editForm, unit: e.target.value })}
-                      >
-                        {UNITS.map((u) => <option key={u}>{u}</option>)}
-                      </select>
-                    </div>
+                    <input
+                      type="number"
+                      min="0"
+                      step="any"
+                      placeholder="Quantity"
+                      value={editForm.quantity}
+                      onChange={(e) => setEditForm({ ...editForm, quantity: e.target.value })}
+                    />
                     <select
                       value={editForm.category}
                       onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
@@ -313,7 +265,7 @@ export default function Pantry() {
                 <li key={item.id} className={`item-card${item.exclude_from_recipes ? " item-card--excluded" : ""}`}>
                   <div className="item-info">
                     <span className="item-name">{item.name}</span>
-                    <span className="item-qty">{item.quantity} {item.unit}</span>
+                    <span className="item-qty">{item.quantity}</span>
                     {item.expiry_date && (
                       <span className="item-expiry">Expires {item.expiry_date}</span>
                     )}
@@ -322,13 +274,15 @@ export default function Pantry() {
                     )}
                   </div>
                   <div className="item-actions">
-                    <button
-                      className="btn-exclude-toggle"
-                      title={item.exclude_from_recipes ? "Include in recipe search" : "Exclude from recipe search"}
-                      onClick={() => handleToggleExclude(item)}
-                    >
-                      {item.exclude_from_recipes ? "🍳" : "🚫"}
-                    </button>
+                    {item.exclude_from_recipes && (
+                      <button
+                        className="btn-exclude-toggle"
+                        title="Include in recipe search"
+                        onClick={() => handleToggleExclude(item)}
+                      >
+                        Include
+                      </button>
+                    )}
                     <button className="btn-ghost" onClick={() => startEdit(item)}>Edit</button>
                     <button className="btn-danger" onClick={() => handleDelete(item.id)}>Delete</button>
                   </div>
