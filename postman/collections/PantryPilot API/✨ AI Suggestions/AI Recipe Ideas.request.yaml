@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{baseUrl}}/api/suggest/recipes"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: text
+  content: |-
+    {
+      "ingredients": ["Chicken Breast", "Garlic", "Onion", "Tomato"]
+    }
+order: 1000

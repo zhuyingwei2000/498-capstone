@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{baseUrl}}/api/recipes/search"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: text
+  content: |-
+    {
+      "ingredients": ["Eggs", "Milk", "Butter", "Flour"]
+    }
+order: 1000

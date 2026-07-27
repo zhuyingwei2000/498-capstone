@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{baseUrl}}/api/pantry/1"
+method: PUT
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: text
+  content: |-
+    {
+      "quantity": 12,
+      "expiry_date": "2026-09-01"
+    }
+order: 5000

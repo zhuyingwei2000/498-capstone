@@ -33,6 +33,15 @@ def create_app():
     from app.pantry import pantry_bp
     app.register_blueprint(pantry_bp)
 
+    from app.receipt import receipt_bp
+    app.register_blueprint(receipt_bp)
+
+    from app.suggest import suggest_bp
+    app.register_blueprint(suggest_bp)
+
+    from app.recipes import recipes_bp
+    app.register_blueprint(recipes_bp)
+
     from app import models  # noqa: F401  (registers models with SQLAlchemy)
 
     @app.get("/health")

@@ -1,0 +1,16 @@
+$kind: http-request
+url: "{{baseUrl}}/api/pantry"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: text
+  content: |-
+    {
+      "name": "Eggs",
+      "quantity": 6,
+      "category": "Dairy & Eggs",
+      "expiry_date": "2026-08-15"
+    }
+order: 2000

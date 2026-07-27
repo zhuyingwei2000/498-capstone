@@ -1,0 +1,204 @@
+{
+  "info": {
+    "name": "PantryPilot API",
+    "_postman_id": "pantrypilot-api-collection",
+    "description": "All PantryPilot backend endpoints. Run 'Login' first — the token is saved automatically.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000" },
+    { "key": "token",   "value": "" }
+  ],
+  "item": [
+    {
+      "name": "🔐 Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.collectionVariables.set('token', pm.response.json().token);",
+                  "  console.log('Token saved!');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"demo@pantrypilot.app\",\n  \"password\": \"demo1234\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  pm.collectionVariables.set('token', pm.response.json().token);",
+                  "  console.log('Token saved!');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "🧺 Pantry",
+      "item": [
+        {
+          "name": "Get All Items",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/pantry",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Add Item",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/pantry",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Eggs\",\n  \"quantity\": 6,\n  \"category\": \"Dairy & Eggs\",\n  \"expiry_date\": \"2026-08-15\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Add Item (auto-merge test — whole milk)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/pantry",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"whole milk\",\n  \"quantity\": 2,\n  \"category\": \"Dairy & Eggs\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Add Item (auto-merge test — Milk again)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/pantry",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Milk\",\n  \"quantity\": 1,\n  \"category\": \"Dairy & Eggs\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Item",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/pantry/1",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 12,\n  \"expiry_date\": \"2026-09-01\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Item",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/pantry/1",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "🍳 Recipes",
+      "item": [
+        {
+          "name": "Search Recipes",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/recipes/search",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ingredients\": [\"Eggs\", \"Milk\", \"Butter\", \"Flour\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Recipe Details",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/recipes/716429",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "✨ AI Suggestions",
+      "item": [
+        {
+          "name": "AI Recipe Ideas",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/suggest/recipes",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ingredients\": [\"Chicken Breast\", \"Garlic\", \"Onion\", \"Tomato\"]\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

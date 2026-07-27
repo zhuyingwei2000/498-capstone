@@ -1,0 +1,15 @@
+$kind: http-request
+url: "{{baseUrl}}/api/pantry"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: text
+  content: |-
+    {
+      "name": "Milk",
+      "quantity": 1,
+      "category": "Dairy & Eggs"
+    }
+order: 4000

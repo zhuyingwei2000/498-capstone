@@ -1,0 +1,6 @@
+$kind: collection
+name: PantryPilot API
+description: All PantryPilot backend endpoints. Run 'Login' first — the token is saved automatically.
+variables:
+  baseUrl: http://localhost:5000
+  token: ""

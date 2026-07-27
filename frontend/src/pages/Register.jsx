@@ -29,7 +29,9 @@ export default function Register() {
   return (
     <div className="auth-page">
       <form className="auth-form" onSubmit={handleSubmit}>
-        <h1>Sign up for PantryPilot</h1>
+        <div className="auth-logo">🥗</div>
+        <h1>PantryPilot</h1>
+        <p className="auth-subtitle">Create your account to get started</p>
         {error && <p className="form-error">{error}</p>}
         <label>
           Email

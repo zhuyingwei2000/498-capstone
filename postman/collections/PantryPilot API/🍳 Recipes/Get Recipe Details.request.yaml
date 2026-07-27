@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{baseUrl}}/api/recipes/716429"
+method: GET
+headers:
+  Authorization: Bearer {{token}}
+order: 2000

@@ -16,6 +16,11 @@ async function request(path, { method = "GET", body, token } = {}) {
 
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
+    // Token expired or invalid — clear it so the route guard sends user to /login.
+    if (res.status === 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/login";
+    }
     throw new Error(data.error || `Request failed with status ${res.status}`);
   }
   return data;
@@ -47,4 +52,26 @@ export function updatePantryItem(token, id, changes) {
 
 export function deletePantryItem(token, id) {
   return request(`/api/pantry/${id}`, { method: "DELETE", token });
+}
+
+// --- Receipt OCR ---
+
+export function scanReceipt(token, imageDataUrl) {
+  return request("/api/receipt/scan", { method: "POST", body: { image: imageDataUrl }, token });
+}
+
+// --- AI Recipe Suggestions ---
+
+export function getAISuggestions(token, ingredients) {
+  return request("/api/suggest/recipes", { method: "POST", body: { ingredients }, token });
+}
+
+// --- Spoonacular Recipe Search ---
+
+export function searchRecipes(token, ingredients) {
+  return request("/api/recipes/search", { method: "POST", body: { ingredients }, token });
+}
+
+export function getRecipeDetails(token, id) {
+  return request(`/api/recipes/${id}`, { token });
 }
