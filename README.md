@@ -1,114 +1,110 @@
 # PantryPilot
 
-手机优先的响应式 Web 应用：拍小票/扫码/传订单截图录入家里的食材库存，推荐"现在就能做"的菜，并自动生成购物清单。
+A full-stack web application that helps users manage their pantry inventory, scan grocery receipts, look up recipes, and get AI-powered meal suggestions.
 
-毕业设计项目，当前阶段：**第一阶段 — 项目骨架 + 注册登录打通**。
+## Tech Stack
 
-## 技术栈
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 19, Vite, CSS3 |
+| Backend | Flask 3, Flask-JWT-Extended, Flask-SQLAlchemy |
+| Database | PostgreSQL (Docker) |
+| Auth | JWT (7-day tokens) |
 
-- 前端：React（JavaScript） + Vite，`react-router-dom` 做路由
-- 后端：Flask REST API，`Flask-SQLAlchemy` + `Flask-Migrate` 管理数据库，`Flask-JWT-Extended` 做登录态
-- 数据库：PostgreSQL（本地用 Docker Compose 起）
+## Features
 
-## 目录结构
+- **User Authentication** — Register and login with JWT-secured sessions
+- **Pantry Management** — Add, edit, and delete pantry items with categories and expiry dates
+- **Barcode Scanner** — Scan product barcodes via device camera using Open Food Facts API
+- **Receipt OCR** — Photograph a grocery receipt to automatically extract food items (Google Gemini Vision)
+- **Recipe Search** — Search 1M+ recipes by ingredient using the Spoonacular API
+- **AI Suggestions** — Get AI-generated recipe ideas from your current pantry (Groq / LLaMA 3.3)
+- **Ingredient Normalization** — Automatically merges duplicate items (e.g. "whole milk" → "Milk")
+- **Shopping List** — Track items to buy
+
+## External APIs
+
+| API | Purpose |
+|-----|---------|
+| Open Food Facts | Barcode → product name lookup (no key required) |
+| Spoonacular | Recipe search by ingredient |
+| Groq (LLaMA 3.3) | AI recipe suggestion generation |
+| Google Gemini Vision | Receipt image OCR and food item extraction |
+
+## Project Structure
 
 ```
-PantryPilot/
-├── docker-compose.yml      # 本地 Postgres
-├── backend/                # Flask API
+498/
+├── backend/
 │   ├── app/
-│   │   ├── __init__.py     # app factory
-│   │   ├── config.py
-│   │   ├── models.py       # User 模型
-│   │   └── auth.py         # /api/auth/register, /api/auth/login
-│   ├── migrations/         # Flask-Migrate / Alembic
+│   │   ├── __init__.py       # App factory, blueprint registration
+│   │   ├── models.py         # SQLAlchemy models (User, PantryItem)
+│   │   ├── auth.py           # Register / Login endpoints
+│   │   ├── pantry.py         # Pantry CRUD + ingredient normalization
+│   │   ├── receipt.py        # Receipt OCR via Gemini Vision
+│   │   ├── recipes.py        # Spoonacular recipe search
+│   │   └── suggest.py        # AI recipe suggestions via Groq
+│   ├── migrations/           # Flask-Migrate DB migrations
+│   ├── requirements.txt
 │   └── run.py
-└── frontend/               # React (Vite)
-    └── src/
-        ├── pages/           # Login.jsx, Register.jsx, Home.jsx
-        ├── api/client.js     # 封装 fetch 调后端
-        └── AuthContext.jsx   # 保存登录 token
+├── frontend/
+│   └── src/
+│       ├── pages/            # Home, Login, Register, Shopping
+│       ├── components/       # BarcodeScanner, ReceiptScanner, etc.
+│       └── api/              # Fetch client, TheMealDB helper
+├── PantryPilot_API_Documentation.docx
+├── PantryPilot_Postman_Collection.json
+└── docker-compose.yml
 ```
 
-## 第一次启动（完整步骤）
+## API Endpoints
 
-### 0. 前置依赖
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/auth/register` | | Create account |
+| POST | `/api/auth/login` | | Login, returns JWT |
+| GET | `/api/pantry` | JWT | List all pantry items |
+| POST | `/api/pantry` | JWT | Add item (auto-merges duplicates) |
+| PUT | `/api/pantry/<id>` | JWT | Update item |
+| DELETE | `/api/pantry/<id>` | JWT | Delete item |
+| POST | `/api/receipt/scan` | JWT | OCR a receipt image |
+| GET | `/api/recipes/search` | JWT | Search recipes by ingredients |
+| GET | `/api/recipes/<id>` | JWT | Get recipe details |
+| POST | `/api/suggest/recipes` | JWT | AI-generated recipe suggestions |
 
-- Node.js ≥ 18（自带 npm）
-- Python ≥ 3.10（自带 venv）
-- Docker Desktop（跑本地 Postgres）
+## Running Locally
 
-### 1. 启动数据库
-
-在仓库根目录：
+**Prerequisites:** Docker Desktop, Python 3.12, Node.js 18+
 
 ```bash
-cp .env.example .env        # 第一次需要，里面是 Postgres 的用户名/密码
-docker compose up -d        # 启动本地 Postgres 容器
-docker compose ps           # 确认 pantrypilot-postgres 状态是 Up
-```
+# 1. Start the database
+docker-compose up -d
 
-### 2. 启动后端
-
-```bash
+# 2. Start the backend
 cd backend
 python -m venv venv
-# Windows:
-venv\Scripts\activate
-# macOS/Linux:
-source venv/bin/activate
-
+venv\Scripts\activate        # Windows
 pip install -r requirements.txt
-
-cp .env.example .env        # 第一次需要，按需修改 DATABASE_URL / JWT_SECRET_KEY
-
-# 建表（Flask-Migrate）
-set FLASK_APP=run.py        # Windows cmd: set FLASK_APP=run.py / PowerShell: $env:FLASK_APP="run.py"
+# create backend/.env with keys (see below)
 flask db upgrade
-
-# 启动服务
 python run.py
-```
 
-后端跑在 `http://localhost:5000`，访问 `http://localhost:5000/health` 应该返回 `{"status": "ok"}`。
-
-### 3. 启动前端
-
-新开一个终端：
-
-```bash
+# 3. Start the frontend
 cd frontend
 npm install
-cp .env.example .env         # 第一次需要，里面配的是后端 API 地址
 npm run dev
 ```
 
-前端跑在 `http://localhost:5173`。浏览器打开它，注册一个账号，应该会跳转到占位首页。
+Open [http://localhost:5173](http://localhost:5173)
 
-### 之后再次启动（数据库已建过表）
+## Environment Variables
 
-```bash
-docker compose up -d                          # 仓库根目录
-cd backend && venv\Scripts\activate && python run.py   # 终端 1
-cd frontend && npm run dev                              # 终端 2
+Create `backend/.env`:
+
 ```
-
-## API
-
-| 方法 | 路径 | 说明 |
-|---|---|---|
-| GET | `/health` | 健康检查 |
-| POST | `/api/auth/register` | `{email, password}` → 创建用户，返回 JWT |
-| POST | `/api/auth/login` | `{email, password}` → 返回 JWT |
-
-## 关键决策说明
-
-- **Vite 而不是 Create React App**：CRA 已停止维护，Vite 是目前 React 社区的主流选择，dev server 启动快、热更新快。对你来说用法和 CRA 差不多，主要差异是环境变量要用 `VITE_` 前缀（`import.meta.env.VITE_XXX`）而不是 `REACT_APP_`。
-- **Flask-JWT-Extended 而不是 session/cookie 登录**：前后端是分开部署的（不同端口/不同域名），用 JWT token 比 cookie session 更简单，前端拿到 token 存起来，每次请求带 `Authorization: Bearer <token>` 头即可。
-- **Flask-Migrate (Alembic)**：迁移脚本会记录每次表结构变更，比手写 SQL 建表更安全，后面加 Pantry/Recipes 表时直接 `flask db migrate` 自动生成。
-- **密码哈希**：用 Flask 自带的 `werkzeug.security`（`generate_password_hash`/`check_password_hash`），不存明文密码，也不用额外装包。
-- **`.env` 不进 git**：数据库密码、JWT 密钥都通过 `.env` 文件读取，仓库里只保留 `.env.example` 作为模板，`.gitignore` 已排除所有 `.env` 文件。
-
-## 下一步（第二个里程碑，本阶段不做）
-
-**M2 Pantry 模块**：设计食材表结构（名称、数量、单位、过期日期等），实现手动添加/编辑/删除食材的接口和页面，把首页的占位换成真正的 Pantry 列表页。
+DATABASE_URL=postgresql://pantrypilot:pantrypilot@localhost:5432/pantrypilot
+JWT_SECRET_KEY=<your-secret>
+GROQ_API_KEY=<your-groq-key>
+SPOONACULAR_API_KEY=<your-spoonacular-key>
+GEMINI_API_KEY=<your-gemini-key>
+```
