@@ -27,11 +27,13 @@ export default function Home() {
       </header>
 
       <main className="app-content">
-        {activeTab === "pantry" && <Pantry />}
-        {activeTab === "recipes" && (
-          <Recipes shoppingList={shoppingList} />
-        )}
-        {activeTab === "shopping" && <Shopping shoppingList={shoppingList} />}
+        <div key={activeTab} className="tab-page">
+          {activeTab === "pantry" && <Pantry />}
+          {activeTab === "recipes" && (
+            <Recipes shoppingList={shoppingList} />
+          )}
+          {activeTab === "shopping" && <Shopping shoppingList={shoppingList} />}
+        </div>
       </main>
 
       <nav className="bottom-nav">
