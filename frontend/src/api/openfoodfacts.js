@@ -1,4 +1,4 @@
-const OFF_BASE = "https://world.openfoodfacts.org/api/v2/product";
+const OFF_BASE = "https://world.openfoodfacts.org/api/v0/product";
 
 // Maps Open Food Facts category tags to our fixed category list.
 function mapCategory(tags) {
@@ -32,8 +32,13 @@ function mapCategory(tags) {
 // Looks up a barcode on Open Food Facts.
 // Returns { name, category } on success; throws an Error on failure.
 export async function lookupBarcode(barcode) {
-  const res = await fetch(`${OFF_BASE}/${barcode}.json`);
-  if (!res.ok) throw new Error("Network error looking up barcode");
+  let res;
+  try {
+    res = await fetch(`${OFF_BASE}/${barcode}.json`);
+  } catch {
+    throw new Error("Cannot reach Open Food Facts — check your connection");
+  }
+  if (!res.ok) throw new Error(`Barcode lookup failed (HTTP ${res.status})`);
 
   const data = await res.json();
   if (data.status !== 1) throw new Error("Product not found in Open Food Facts database");

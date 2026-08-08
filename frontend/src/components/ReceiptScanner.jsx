@@ -21,6 +21,11 @@ export default function ReceiptScanner({ onDone, onClose }) {
     if (step !== "camera") return;
     setCameraError("");
 
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setCameraError("Camera requires HTTPS. Please use Upload Photo instead.");
+      return;
+    }
+
     navigator.mediaDevices
       .getUserMedia({ video: { facingMode: "environment" }, audio: false })
       .then((stream) => {
