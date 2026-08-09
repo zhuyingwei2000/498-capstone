@@ -1870,6 +1870,140 @@ body {
   line-height: 1.5;
 }
 
+.empty-state-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.empty-action-btn {
+  padding: 10px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+}
+
+.empty-action-btn:hover {
+  border-color: var(--green);
+  background: var(--green-bg, rgba(47,158,68,.08));
+}
+
+/* ── Welcome Tour ────────────────────────────────────────── */
+
+.tour-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.tour-modal {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 36px 28px 28px;
+  max-width: 380px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  position: relative;
+}
+
+.tour-skip {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: var(--text-3);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.tour-skip:hover { color: var(--text-2); }
+
+.tour-emoji {
+  font-size: 3.2rem;
+  margin-bottom: 14px;
+  line-height: 1;
+}
+
+.tour-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 10px;
+}
+
+.tour-desc {
+  font-size: 0.9rem;
+  color: var(--text-2);
+  line-height: 1.6;
+  margin: 0 0 18px;
+}
+
+.tour-highlights {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+
+.tour-highlights li {
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  font-size: 0.88rem;
+  color: var(--text);
+}
+
+.tour-dots {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 22px;
+}
+
+.tour-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: var(--border);
+  cursor: pointer;
+  padding: 0;
+  transition: background var(--transition), transform var(--transition);
+}
+
+.tour-dot--active {
+  background: var(--green);
+  transform: scale(1.3);
+}
+
+.tour-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.tour-cta {
+  flex: 1;
+}
+
 /* ── Achievement toast ───────────────────────────────────── */
 
 .achievement-toast {

@@ -281,7 +281,18 @@ export default function Pantry() {
         <div className="empty-state">
           <span className="empty-state-icon">🧺</span>
           <p className="empty-state-title">Your pantry is empty</p>
-          <p className="empty-state-desc">Add your first item to get started!</p>
+          <p className="empty-state-desc">Add your first ingredient to get started!</p>
+          <div className="empty-state-actions">
+            <button className="empty-action-btn" onClick={() => setShowScanner(true)}>
+              📷 Scan Barcode
+            </button>
+            <button className="empty-action-btn" onClick={() => setShowReceipt(true)}>
+              📄 Upload Receipt
+            </button>
+            <button className="empty-action-btn" onClick={() => { setShowAdd(true); setAddError(""); }}>
+              ✏️ Add Manually
+            </button>
+          </div>
         </div>
       )}
 

@@ -1,0 +1,13 @@
+# Use this workspace to collaborate
+workspace:
+  id: 9e58dc3b-0c5f-452a-85a2-b9f6e4442bc9
+
+cloudResources:
+  collections:
+    ../postman/collections/PantryPilot API: 53c0b30e-10f1-47ab-a190-0de7b0c6ec93
+
+# All resources in the `postman/` folder are automatically registered in Local View.
+# Point to additional files outside the `postman/` folder to register them individually. Example:
+#localResources:
+#  collections:
+#    - ../tests/E2E Test Collection/

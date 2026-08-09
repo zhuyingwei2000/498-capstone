@@ -5,12 +5,14 @@ import { useShoppingList } from "../hooks/useShoppingList";
 import Pantry from "./Pantry";
 import Recipes from "./Recipes";
 import Shopping from "./Shopping";
+import WelcomeTour from "../components/WelcomeTour";
 
 export default function Home() {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("pantry");
   const shoppingList = useShoppingList();
+  const [showTour, setShowTour] = useState(() => !localStorage.getItem("pp_tour_done"));
 
   function handleLogout() {
     logout();
@@ -21,6 +23,7 @@ export default function Home() {
 
   return (
     <div className="app-shell">
+      {showTour && <WelcomeTour onDone={() => setShowTour(false)} />}
       <header className="app-header">
         <h1 className="app-title">PantryPilot</h1>
         <button className="btn-ghost" onClick={handleLogout}>Log out</button>
