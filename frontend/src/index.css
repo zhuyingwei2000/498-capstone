@@ -109,50 +109,6 @@ body {
   color: var(--text-2);
 }
 
-.btn-demo {
-  padding: 13px;
-  border: none;
-  border-radius: var(--radius-sm);
-  background: var(--green);
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 700;
-  cursor: pointer;
-  letter-spacing: 0.01em;
-  transition: background var(--transition), transform var(--transition),
-              box-shadow var(--transition);
-  box-shadow: 0 2px 8px rgba(47,158,68,.3);
-}
-
-.btn-demo:hover:not(:disabled) {
-  background: var(--green-dark);
-  box-shadow: 0 4px 14px rgba(47,158,68,.4);
-}
-
-.btn-demo:active:not(:disabled) {
-  transform: scale(0.98);
-}
-
-.btn-demo:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
-
-.auth-divider {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--text-3);
-  font-size: 0.8rem;
-}
-
-.auth-divider::before,
-.auth-divider::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
 
 .auth-form input {
   padding: 11px 14px;

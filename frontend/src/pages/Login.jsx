@@ -26,30 +26,12 @@ export default function Login() {
     }
   }
 
-  async function handleDemo() {
-    setError("");
-    setLoading(true);
-    try {
-      const data = await login("demo@pantrypilot.app", "demo1234");
-      loginWithToken(data.token);
-      navigate("/");
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
   return (
     <div className="auth-page">
       <form className="auth-form" onSubmit={handleSubmit}>
         <div className="auth-logo">🥗</div>
         <h1>PantryPilot</h1>
         <p className="auth-subtitle">Your smart pantry & recipe companion</p>
-        <button type="button" className="btn-demo" onClick={handleDemo} disabled={loading}>
-          {loading ? "Loading..." : "✦ Try Demo"}
-        </button>
-        <div className="auth-divider"><span>or sign in</span></div>
         {error && <p className="form-error">{error}</p>}
         <label>
           Email
