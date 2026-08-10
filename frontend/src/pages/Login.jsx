@@ -13,6 +13,14 @@ export default function Login() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (!email.includes("@") || !email.includes(".")) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+    if (!password) {
+      setError("Please enter your password.");
+      return;
+    }
     setError("");
     setLoading(true);
     try {
@@ -28,7 +36,7 @@ export default function Login() {
 
   return (
     <div className="auth-page">
-      <form className="auth-form" onSubmit={handleSubmit}>
+      <form className="auth-form" onSubmit={handleSubmit} noValidate>
         <div className="auth-logo">🥗</div>
         <h1>PantryPilot</h1>
         <p className="auth-subtitle">Your smart pantry & recipe companion</p>
@@ -36,10 +44,11 @@ export default function Login() {
         <label>
           Email
           <input
-            type="email"
+            type="text"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            required
+            placeholder="you@example.com"
+            autoComplete="email"
           />
         </label>
         <label>
@@ -48,7 +57,8 @@ export default function Login() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required
+            placeholder="Your password"
+            autoComplete="current-password"
           />
         </label>
         <button type="submit" disabled={loading}>

@@ -23,6 +23,17 @@ function groupByCategory(items) {
   );
 }
 
+/* ── User ID from JWT ─────────────────────────────────────── */
+function getUserId(token) {
+  if (!token) return "guest";
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.sub || "guest";
+  } catch {
+    return "guest";
+  }
+}
+
 /* ── Achievements ─────────────────────────────────────────── */
 const ACH = {
   FIRST_RECIPE:  { id: "first_recipe",  emoji: "🍳", title: "Recipe Explorer",   desc: "Found your first recipe!"          },
@@ -32,10 +43,11 @@ const ACH = {
   PANTRY_MASTER: { id: "pantry_master", emoji: "🧺", title: "Well Stocked",       desc: "10+ items in your pantry!"         },
 };
 
-function useAchievements() {
+function useAchievements(token) {
+  const uid = getUserId(token);
   const [toast, setToast] = useState(null);
   function unlock(ach) {
-    const key = `pp_ach_${ach.id}`;
+    const key = `pp_ach_${uid}_${ach.id}`;
     if (localStorage.getItem(key)) return;
     localStorage.setItem(key, "1");
     setToast(ach);
@@ -45,9 +57,11 @@ function useAchievements() {
 }
 
 /* ── Saved recipes (localStorage) ────────────────────────── */
-function useSavedRecipes() {
+function useSavedRecipes(token) {
+  const uid = getUserId(token);
+  const storageKey = `pp_saved_${uid}`;
   const [saved, setSaved] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("pp_saved") || "[]"); }
+    try { return JSON.parse(localStorage.getItem(storageKey) || "[]"); }
     catch { return []; }
   });
   function toggle(recipe) {
@@ -55,7 +69,7 @@ function useSavedRecipes() {
       const next = prev.some(r => r._key === recipe._key)
         ? prev.filter(r => r._key !== recipe._key)
         : [...prev, { ...recipe, savedAt: new Date().toISOString() }];
-      try { localStorage.setItem("pp_saved", JSON.stringify(next)); } catch {}
+      try { localStorage.setItem(storageKey, JSON.stringify(next)); } catch {}
       return next;
     });
   }
@@ -82,8 +96,8 @@ export default function Recipes({ shoppingList }) {
   const [potJiggle, setPotJiggle] = useState(false);
   const [potBounce, setPotBounce] = useState(false);
 
-  const { toast, unlock } = useAchievements();
-  const { saved, toggle: toggleSave, isSaved } = useSavedRecipes();
+  const { toast, unlock } = useAchievements(token);
+  const { saved, toggle: toggleSave, isSaved } = useSavedRecipes(token);
 
   async function loadPantry() {
     setPantryLoading(true);

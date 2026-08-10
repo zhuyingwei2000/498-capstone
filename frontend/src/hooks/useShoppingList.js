@@ -1,19 +1,29 @@
 import { useEffect, useState } from "react";
 
-const STORAGE_KEY = "pantrypilot_shopping";
+function getUserKey(token) {
+  if (!token) return "pantrypilot_shopping_guest";
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return `pantrypilot_shopping_${payload.sub}`;
+  } catch {
+    return "pantrypilot_shopping_guest";
+  }
+}
 
-export function useShoppingList() {
+export function useShoppingList(token) {
+  const storageKey = getUserKey(token);
+
   const [items, setItems] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+      return JSON.parse(localStorage.getItem(storageKey) || "[]");
     } catch {
       return [];
     }
   });
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  }, [items]);
+    localStorage.setItem(storageKey, JSON.stringify(items));
+  }, [items, storageKey]);
 
   // newItems: [{ id, name, recipe }]
   function addItems(newItems) {

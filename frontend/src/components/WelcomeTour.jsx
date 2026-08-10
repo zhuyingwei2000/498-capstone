@@ -21,11 +21,12 @@ const STEPS = [
   },
 ];
 
-export default function WelcomeTour({ onDone }) {
+export default function WelcomeTour({ onDone, uid }) {
   const [step, setStep] = useState(0);
 
   function finish() {
-    localStorage.setItem("pp_tour_done", "1");
+    const key = uid ? `pp_tour_done_${uid}` : "pp_tour_done";
+    localStorage.setItem(key, "1");
     onDone();
   }
 

@@ -7,12 +7,23 @@ import Recipes from "./Recipes";
 import Shopping from "./Shopping";
 import WelcomeTour from "../components/WelcomeTour";
 
+function getUserId(token) {
+  if (!token) return "guest";
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.sub || "guest";
+  } catch {
+    return "guest";
+  }
+}
+
 export default function Home() {
-  const { logout } = useAuth();
+  const { logout, token } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("pantry");
-  const shoppingList = useShoppingList();
-  const [showTour, setShowTour] = useState(() => !localStorage.getItem("pp_tour_done"));
+  const shoppingList = useShoppingList(token);
+  const uid = getUserId(token);
+  const [showTour, setShowTour] = useState(() => !localStorage.getItem(`pp_tour_done_${uid}`));
 
   function handleLogout() {
     logout();
@@ -23,7 +34,7 @@ export default function Home() {
 
   return (
     <div className="app-shell">
-      {showTour && <WelcomeTour onDone={() => setShowTour(false)} />}
+      {showTour && <WelcomeTour onDone={() => setShowTour(false)} uid={uid} />}
       <header className="app-header">
         <h1 className="app-title">PantryPilot</h1>
         <button className="btn-ghost" onClick={handleLogout}>Log out</button>

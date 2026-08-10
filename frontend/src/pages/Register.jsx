@@ -14,6 +14,14 @@ export default function Register() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
+    if (!email.includes("@") || !email.includes(".")) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters.");
+      return;
+    }
     setLoading(true);
     try {
       const data = await register(email, password);
@@ -28,7 +36,7 @@ export default function Register() {
 
   return (
     <div className="auth-page">
-      <form className="auth-form" onSubmit={handleSubmit}>
+      <form className="auth-form" onSubmit={handleSubmit} noValidate>
         <div className="auth-logo">🥗</div>
         <h1>PantryPilot</h1>
         <p className="auth-subtitle">Create your account to get started</p>
@@ -36,10 +44,11 @@ export default function Register() {
         <label>
           Email
           <input
-            type="email"
+            type="text"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            required
+            placeholder="you@example.com"
+            autoComplete="email"
           />
         </label>
         <label>
@@ -48,8 +57,8 @@ export default function Register() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            minLength={8}
-            required
+            placeholder="Min. 8 characters"
+            autoComplete="new-password"
           />
         </label>
         <button type="submit" disabled={loading}>
