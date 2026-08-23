@@ -17,6 +17,7 @@ A full-stack web application that helps users manage their pantry inventory, sca
 - **Pantry Management** — Add, edit, and delete pantry items with categories and expiry dates
 - **Barcode Scanner** — Scan product barcodes via device camera using Open Food Facts API
 - **Receipt OCR** — Photograph a grocery receipt to automatically extract food items (Google Gemini Vision)
+- **Food Photo Scan** — Take a photo of any food pile or fridge contents and let AI identify and add all visible ingredients automatically (Google Gemini Vision)
 - **Recipe Search** — Search 1M+ recipes by ingredient using the Spoonacular API
 - **AI Suggestions** — Get AI-generated recipe ideas from your current pantry (Groq / LLaMA 3.3)
 - **Ingredient Normalization** — Automatically merges duplicate items (e.g. "whole milk" → "Milk")
@@ -42,6 +43,7 @@ A full-stack web application that helps users manage their pantry inventory, sca
 │   │   ├── auth.py           # Register / Login endpoints
 │   │   ├── pantry.py         # Pantry CRUD + ingredient normalization
 │   │   ├── receipt.py        # Receipt OCR via Gemini Vision
+│   │   ├── vision.py         # Food photo scan via Gemini Vision
 │   │   ├── recipes.py        # Spoonacular recipe search
 │   │   └── suggest.py        # AI recipe suggestions via Groq
 │   ├── migrations/           # Flask-Migrate DB migrations
@@ -68,6 +70,7 @@ A full-stack web application that helps users manage their pantry inventory, sca
 | PUT | `/api/pantry/<id>` | JWT | Update item |
 | DELETE | `/api/pantry/<id>` | JWT | Delete item |
 | POST | `/api/receipt/scan` | JWT | OCR a receipt image |
+| POST | `/api/vision/scan` | JWT | Identify foods from a photo |
 | GET | `/api/recipes/search` | JWT | Search recipes by ingredients |
 | GET | `/api/recipes/<id>` | JWT | Get recipe details |
 | POST | `/api/suggest/recipes` | JWT | AI-generated recipe suggestions |
