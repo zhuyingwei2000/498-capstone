@@ -42,6 +42,9 @@ def create_app():
     from app.recipes import recipes_bp
     app.register_blueprint(recipes_bp)
 
+    from app.vision import vision_bp
+    app.register_blueprint(vision_bp)
+
     from app import models  # noqa: F401  (registers models with SQLAlchemy)
 
     @app.get("/health")

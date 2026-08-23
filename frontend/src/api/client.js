@@ -60,6 +60,10 @@ export function scanReceipt(token, imageDataUrl) {
   return request("/api/receipt/scan", { method: "POST", body: { image: imageDataUrl }, token });
 }
 
+export function scanFoodPhoto(token, imageDataUrl) {
+  return request("/api/vision/scan", { method: "POST", body: { image: imageDataUrl }, token });
+}
+
 // --- AI Recipe Suggestions ---
 
 export function getAISuggestions(token, ingredients) {

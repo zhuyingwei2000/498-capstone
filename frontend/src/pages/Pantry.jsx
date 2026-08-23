@@ -2,6 +2,7 @@ import { useEffect, useState, lazy, Suspense } from "react";
 import { getPantryItems, addPantryItem, updatePantryItem, deletePantryItem } from "../api/client";
 import { useAuth } from "../AuthContext";
 import ReceiptScanner from "../components/ReceiptScanner";
+import FoodPhotoScanner from "../components/FoodPhotoScanner";
 
 const BarcodeScanner = lazy(() => import("../components/BarcodeScanner"));
 
@@ -56,6 +57,7 @@ export default function Pantry() {
 
   const [showScanner, setShowScanner] = useState(false);
   const [showReceipt, setShowReceipt] = useState(false);
+  const [showPhotoScan, setShowPhotoScan] = useState(false);
   const [search, setSearch] = useState("");
 
   const [editId, setEditId] = useState(null);
@@ -153,6 +155,11 @@ export default function Pantry() {
     await fetchItems();
   }
 
+  async function handlePhotoScanDone() {
+    setShowPhotoScan(false);
+    await fetchItems();
+  }
+
   // Expiry alerts
   const expiredItems  = items.filter(i => i.expiry_date && getExpiryStatus(i.expiry_date)?.status === "expired");
   const expiringItems = items.filter(i => i.expiry_date && getExpiryStatus(i.expiry_date)?.status === "expiring");
@@ -175,11 +182,16 @@ export default function Pantry() {
         <ReceiptScanner onDone={handleReceiptDone} onClose={() => setShowReceipt(false)} />
       )}
 
+      {showPhotoScan && (
+        <FoodPhotoScanner onDone={handlePhotoScanDone} onClose={() => setShowPhotoScan(false)} />
+      )}
+
       <div className="pantry-header">
         <h2>My Pantry</h2>
         <div className="pantry-header-actions">
           <button className="btn-ghost" onClick={() => setShowReceipt(true)}>📄 Receipt</button>
           <button className="btn-ghost" onClick={() => setShowScanner(true)}>📷 Scan</button>
+          <button className="btn-ghost" onClick={() => setShowPhotoScan(true)}>🍱 Photo</button>
           <button className="btn-primary" onClick={() => { setShowAdd(true); setAddError(""); }}>
             + Add Item
           </button>
@@ -288,6 +300,9 @@ export default function Pantry() {
             </button>
             <button className="empty-action-btn" onClick={() => setShowReceipt(true)}>
               📄 Upload Receipt
+            </button>
+            <button className="empty-action-btn" onClick={() => setShowPhotoScan(true)}>
+              🍱 Photo Scan
             </button>
             <button className="empty-action-btn" onClick={() => { setShowAdd(true); setAddError(""); }}>
               ✏️ Add Manually
