@@ -29,26 +29,20 @@ def suggest_recipes():
     if not ingredients:
         return jsonify({"error": "ingredients required"}), 400
 
-    api_key = os.environ.get("GROQ_API_KEY")
+    api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
-        return jsonify({"error": "GROQ_API_KEY not configured"}), 500
+        return jsonify({"error": "GEMINI_API_KEY not configured"}), 500
 
     try:
-        from groq import Groq
+        from google import genai
 
-        client = Groq(api_key=api_key)
-        completion = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[
-                {
-                    "role": "user",
-                    "content": PROMPT.format(ingredients=", ".join(ingredients)),
-                }
-            ],
-            max_tokens=2048,
+        client = genai.Client(api_key=api_key)
+        response = client.models.generate_content(
+            model="gemini-flash-latest",
+            contents=PROMPT.format(ingredients=", ".join(ingredients)),
         )
 
-        raw = completion.choices[0].message.content.strip()
+        raw = response.text.strip()
         match = re.search(r"\[.*\]", raw, re.DOTALL)
         if not match:
             return jsonify({"recipes": []}), 200
